@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laundry Reminder & Tracker</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-color: #435ebe;
+            --success-color: #198754;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #667eea 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .page-heading {
+            margin-bottom: 2rem;
+        }
+
+        .laundry-button {
+            min-height: 180px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .laundry-button:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .stats-card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stats-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .stats-icon.blue {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .stats-icon.green {
+            background: linear-gradient(135deg, #06d001 0%, #00a65a 100%);
+            color: white;
+        }
+
+        .stats-icon.purple {
+            background: linear-gradient(135deg, #a044ff 0%, #6a3093 100%);
+            color: white;
+        }
+
+        .laundry-item {
+            border-left: 5px solid var(--primary-color);
+            margin-bottom: 1rem;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .laundry-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .laundry-item.completed {
+            border-left-color: var(--success-color);
+            opacity: 0.85;
+        }
+
+        .countdown {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-family: 'Courier New', monospace;
+        }
+
+        .countdown.warning {
+            color: var(--warning-color);
+        }
+
+        .countdown.danger {
+            color: var(--danger-color);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .btn-sync {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 999;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+            border: none;
+            background: linear-gradient(135deg, #ea4335 0%, #d62f21 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-sync:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.5);
+        }
+
+        .btn-sync.synced {
+            background: linear-gradient(135deg, #06d001 0%, #00a65a 100%);
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .card-header {
+            background: white;
+            border-bottom: 2px solid #f0f0f0;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .badge-status {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+        }
+
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark mb-4">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-droplet-fill me-2"></i>
+                Laundry Reminder & Tracker
+            </span>
+            <div class="d-flex align-items-center">
+                <span class="text-white me-3" id="clock"></span>
+                <button class="btn btn-light btn-sm" onclick="location.reload()">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Page Heading -->
+        <div class="page-heading text-center">
+            <h2 class="fw-bold">Dashboard Laundry</h2>
+            <p class="text-muted">Kelola jadwal laundry kamu dengan mudah</p>
+        </div>
+
+        <!-- Main Actions & Stats -->
+        <div class="row mb-4">
+            <!-- Tombol Taruh Laundry -->
+            <div class="col-12 col-lg-6 mb-4">
+                <div class="card laundry-button h-100" onclick="addLaundry()">
+                    <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
+                        <i class="bi bi-plus-circle mb-3" style="font-size: 4rem;"></i>
+                        <h3 class="fw-bold mb-2">Taruh Laundry</h3>
+                        <p class="mb-0">Klik untuk mencatat laundry baru</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistik -->
+            <div class="col-12 col-lg-6">
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <div class="card stats-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="stats-icon blue me-3">
+                                        <i class="bi bi-clock-history"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Laundry Aktif</small>
+                                        <h3 class="fw-bold mb-0" id="active-count">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card stats-card h-100">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="stats-icon green me-3">
+                                        <i class="bi bi-check-circle"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Selesai</small>
+                                        <h3 class="fw-bold mb-0" id="completed-count">0</h3>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <small class="text-muted d-block mb-2">Status Sinkronisasi</small>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-google text-danger me-2" style="font-size: 1.5rem;"></i>
+                                    <span id="sync-status" class="fw-semibold">Belum tersinkronisasi</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-primary" onclick="syncGoogleCalendar()">
+                                <i class="bi bi-arrow-repeat me-1"></i>
+                                Sync
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Laundry Aktif -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-hourglass-split me-2"></i>
+                            Laundry Aktif
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="active-laundry">
+                            <div class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p class="mb-0">Tidak ada laundry aktif</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Riwayat -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock-history me-2"></i>
+                            Riwayat Laundry
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="history-laundry">
+                            <div class="empty-state">
+                                <i class="bi bi-archive"></i>
+                                <p class="mb-0">Belum ada riwayat</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol Sync Google Calendar -->
+    <button class="btn btn-danger btn-sync" id="sync-btn" onclick="syncGoogleCalendar()" title="Sync dengan Google Calendar">
+        <i class="bi bi-google" style="font-size: 1.75rem;"></i>
+    </button>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Data Storage
+        let laundryData = JSON.parse(localStorage.getItem('laundryData')) || [];
+        let googleCalendarConnected = localStorage.getItem('googleCalendarConnected') === 'true';
+
+        // Google Calendar Config
+        const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
+        const API_KEY = 'YOUR_API_KEY';
+        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
+        const SCOPES = 'https://www.googleapis.com/auth/calendar.events';
+
+        let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLaundryData();
+            updateUI();
+            startCountdownTimer();
+            startClock();
+            loadGoogleAPI();
+            updateSyncButton();
+        });
+
+        // Clock
+        function startClock() {
+            function updateClock() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                document.getElementById('clock').textContent = timeString;
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // Add Laundry
+        function addLaundry() {
+            const now = new Date();
+            const pickupTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 jam dari sekarang
+
+            const laundryItem = {
+                id: Date.now(),
+                startTime: now.toISOString(),
+                pickupTime: pickupTime.toISOString(),
+                status: 'active',
+                synced: false,
+                calendarEventId: null
+            };
+
+            laundryData.push(laundryItem);
+            saveLaundryData();
+            updateUI();
+
+            // Sync to Google Calendar if connected
+            if (googleCalendarConnected && gapiInited) {
+                addToGoogleCalendar(laundryItem);
+            }
+
+            showToast('success', 'Laundry berhasil ditambahkan! Reminder akan muncul 24 jam dari sekarang.');
+        }
+
+        // Mark as Complete
+        function markComplete(id) {
+            const item = laundryData.find(l => l.id === id);
+            if (item) {
+                item.status = 'completed';
+                item.completedTime = new Date().toISOString();
+                saveLaundryData();
+                updateUI();
+
+                // Delete from Google Calendar if synced
+                if (item.calendarEventId && googleCalendarConnected && gapiInited) {
+                    deleteFromGoogleCalendar(item.calendarEventId);
+                }
+
+                showToast('success', 'Laundry ditandai selesai!');
+            }
+        }
+
+        // Delete Laundry
+        function deleteLaundry(id) {
+            if (!confirm('Yakin ingin menghapus laundry ini?')) return;
+
+            const item = laundryData.find(l => l.id === id);
+            if (item && item.calendarEventId && googleCalendarConnected && gapiInited) {
+                deleteFromGoogleCalendar(item.calendarEventId);
+            }
+
+            laundryData = laundryData.filter(l => l.id !== id);
+            saveLaundryData();
+            updateUI();
+            showToast('info', 'Laundry dihapus!');
+        }
+
+        // Update UI
+        function updateUI() {
+            const activeLaundry = laundryData.filter(l => l.status === 'active');
+            const completedLaundry = laundryData.filter(l => l.status === 'completed');
+
+            // Update counts
+            document.getElementById('active-count').textContent = activeLaundry.length;
+            document.getElementById('completed-count').textContent = completedLaundry.length;
+
+            // Update active laundry list
+            const activeContainer = document.getElementById('active-laundry');
+            if (activeLaundry.length === 0) {
+                activeContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-inbox"></i>
+                        <p class="mb-0">Tidak ada laundry aktif</p>
+                    </div>
+                `;
+            } else {
+                activeContainer.innerHTML = activeLaundry.map(item => createLaundryCard(item)).join('');
+            }
+
+            // Update history
+            const historyContainer = document.getElementById('history-laundry');
+            if (completedLaundry.length === 0) {
+                historyContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="bi bi-archive"></i>
+                        <p class="mb-0">Belum ada riwayat</p>
+                    </div>
+                `;
+            } else {
+                historyContainer.innerHTML = completedLaundry.slice(-10).reverse().map(item => createLaundryCard(item)).join('');
+            }
+
+            // Update sync status
+            const syncStatusEl = document.getElementById('sync-status');
+            if (googleCalendarConnected) {
+                syncStatusEl.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> Tersinkronisasi';
+            } else {
+                syncStatusEl.innerHTML = '<i class="bi bi-x-circle-fill text-muted me-1"></i> Belum tersinkronisasi';
+            }
+        }
+
+        // Create Laundry Card
+        function createLaundryCard(item) {
+            const startTime = new Date(item.startTime);
+            const pickupTime = new Date(item.pickupTime);
+            const isActive = item.status === 'active';
+
+            return `
+                <div class="laundry-item ${isActive ? '' : 'completed'}">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h5 class="mb-2">
+                                <i class="bi bi-droplet-fill text-primary me-2"></i>
+                                Laundry #${item.id}
+                                ${item.synced ? '<i class="bi bi-google text-danger ms-2" title="Synced to Google Calendar"></i>' : ''}
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="bi bi-box-arrow-in-down me-1"></i>
+                                        <strong>Ditaruh:</strong> ${formatDateTime(startTime)}
+                                    </small>
+                                </div>
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="bi bi-box-arrow-up me-1"></i>
+                                        <strong>Diambil:</strong> ${formatDateTime(pickupTime)}
+                                    </small>
+                                </div>
+                            </div>
+                            ${isActive ? `
+                                <div class="countdown mt-3" id="countdown-${item.id}"></div>
+                            ` : `
+                                <div class="mt-3">
+                                    <span class="badge bg-success badge-status">
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        Selesai
+                                    </span>
+                                    ${item.completedTime ? `<small class="text-muted ms-2">${formatDateTime(new Date(item.completedTime))}</small>` : ''}
+                                </div>
+                            `}
+                        </div>
+                        <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                            ${isActive ? `
+                                <button class="btn btn-success me-2 mb-2" onclick="markComplete(${item.id})">
+                                    <i class="bi bi-check-circle me-1"></i> Selesai
+                                </button>
+                            ` : ''}
+                            <button class="btn btn-outline-danger mb-2" onclick="deleteLaundry(${item.id})">
+                                <i class="bi bi-trash me-1"></i> Hapus
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Countdown Timer
+        function startCountdownTimer() {
+            setInterval(() => {
+                const activeLaundry = laundryData.filter(l => l.status === 'active');
+                activeLaundry.forEach(item => {
+                    const countdownEl = document.getElementById(\`countdown-\${item.id}\`);
+                    if (countdownEl) {
+                        const remaining = new Date(item.pickupTime) - new Date();
+                        if (remaining > 0) {
+                            const hours = remaining / (1000 * 60 * 60);
+                            let className = 'countdown';
+                            if (hours < 1) className += ' danger';
+                            else if (hours < 3) className += ' warning';
+
+                            countdownEl.className = className;
+                            countdownEl.innerHTML = \`
+                                <i class="bi bi-alarm me-2"></i>
+                                \${formatCountdown(remaining)}
+                            \`;
+                        } else {
+                            countdownEl.className = 'countdown danger';
+                            countdownEl.innerHTML = \`
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                Waktunya mengambil laundry!
+                            \`;
+                        }
+                    }
+                });
+            }, 1000);
+        }
+
+        // Format Countdown
+        function formatCountdown(ms) {
+            const hours = Math.floor(ms / (1000 * 60 * 60));
+            const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((ms % (1000 * 60)) / 1000);
+            return \`\${hours.toString().padStart(2, '0')}:\${minutes.toString().padStart(2, '0')}:\${seconds.toString().padStart(2, '0')}\`;
+        }
+
+        // Format DateTime
+        function formatDateTime(date) {
+            return date.toLocaleString('id-ID', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Save Data
+        function saveLaundryData() {
+            localStorage.setItem('laundryData', JSON.stringify(laundryData));
+        }
+
+        // Load Data
+        function loadLaundryData() {
+            const saved = localStorage.getItem('laundryData');
+            if (saved) {
+                laundryData = JSON.parse(saved);
+            }
+        }
+
+        // Show Toast
+        function showToast(type, message) {
+            const toast = document.createElement('div');
+            toast.className = \`alert alert-\${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed top-0 start-50 translate-middle-x mt-3\`;
+            toast.style.zIndex = '9999';
+            toast.innerHTML = \`
+                <i class="bi bi-\${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle'} me-2"></i>
+                \${message}
+            \`;
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Update Sync Button
+        function updateSyncButton() {
+            const syncBtn = document.getElementById('sync-btn');
+            if (googleCalendarConnected) {
+                syncBtn.classList.add('synced');
+                syncBtn.classList.remove('btn-danger');
+                syncBtn.classList.add('btn-success');
+            }
+        }
+
+        // ==================== GOOGLE CALENDAR INTEGRATION ====================
+
+        // Load Google API
+        function loadGoogleAPI() {
+            // Check if credentials are configured
+            if (CLIENT_ID === 'YOUR_CLIENT_ID.apps.googleusercontent.com' || API_KEY === 'YOUR_API_KEY') {
+                console.warn('Google Calendar credentials not configured. Please update CLIENT_ID and API_KEY in index.html');
+                return;
+            }
+
+            // Load Google API Script
+            const script1 = document.createElement('script');
+            script1.src = 'https://apis.google.com/js/api.js';
+            script1.async = true;
+            script1.defer = true;
+            script1.onload = gapiLoaded;
+            document.body.appendChild(script1);
+
+            // Load Google Identity Services
+            const script2 = document.createElement('script');
+            script2.src = 'https://accounts.google.com/gsi/client';
+            script2.async = true;
+            script2.defer = true;
+            script2.onload = gisLoaded;
+            document.body.appendChild(script2);
+        }
+
+        function gapiLoaded() {
+            gapi.load('client', initializeGapiClient);
+        }
+
+        async function initializeGapiClient() {
+            try {
+                await gapi.client.init({
+                    apiKey: API_KEY,
+                    discoveryDocs: [DISCOVERY_DOC],
+                });
+                gapiInited = true;
+                console.log('Google Calendar API initialized');
+            } catch (err) {
+                console.error('Error initializing GAPI:', err);
+            }
+        }
+
+        function gisLoaded() {
+            try {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID,
+                    scope: SCOPES,
+                    callback: '', // defined later
+                });
+                gisInited = true;
+                console.log('Google Identity Services initialized');
+            } catch (err) {
+                console.error('Error initializing GIS:', err);
+            }
+        }
+
+        // Sync to Google Calendar
+        function syncGoogleCalendar() {
+            if (!gapiInited || !gisInited) {
+                showToast('error', 'Google Calendar API belum siap atau belum dikonfigurasi. Silakan cek CLIENT_ID dan API_KEY di kode.');
+                return;
+            }
+
+            tokenClient.callback = async (resp) => {
+                if (resp.error !== undefined) {
+                    showToast('error', 'Gagal connect ke Google: ' + resp.error);
+                    return;
+                }
+
+                googleCalendarConnected = true;
+                localStorage.setItem('googleCalendarConnected', 'true');
+                updateUI();
+                updateSyncButton();
+
+                // Sync all unsynced items
+                const unsynced = laundryData.filter(l => l.status === 'active' && !l.synced);
+                for (const item of unsynced) {
+                    await addToGoogleCalendar(item);
+                }
+
+                showToast('success', 'Berhasil tersinkronisasi dengan Google Calendar!');
+            };
+
+            if (gapi.client.getToken() === null) {
+                tokenClient.requestAccessToken({prompt: 'consent'});
+            } else {
+                tokenClient.requestAccessToken({prompt: ''});
+            }
+        }
+
+        // Add Event to Google Calendar
+        async function addToGoogleCalendar(laundryItem) {
+            try {
+                const event = {
+                    'summary': 'Ambil Laundry',
+                    'description': \`Reminder untuk mengambil laundry yang ditaruh pada \${formatDateTime(new Date(laundryItem.startTime))}\`,
+                    'start': {
+                        'dateTime': laundryItem.pickupTime,
+                        'timeZone': 'Asia/Jakarta'
+                    },
+                    'end': {
+                        'dateTime': new Date(new Date(laundryItem.pickupTime).getTime() + 60*60*1000).toISOString(),
+                        'timeZone': 'Asia/Jakarta'
+                    },
+                    'reminders': {
+                        'useDefault': false,
+                        'overrides': [
+                            {'method': 'popup', 'minutes': 30},
+                            {'method': 'popup', 'minutes': 60}
+                        ]
+                    }
+                };
+
+                const request = await gapi.client.calendar.events.insert({
+                    'calendarId': 'primary',
+                    'resource': event
+                });
+
+                // Update item with calendar event ID
+                laundryItem.calendarEventId = request.result.id;
+                laundryItem.synced = true;
+                saveLaundryData();
+                updateUI();
+
+                console.log('Event created: ' + request.result.htmlLink);
+            } catch (err) {
+                console.error('Error adding to calendar:', err);
+                showToast('error', 'Gagal menambahkan ke Google Calendar: ' + err.message);
+            }
+        }
+
+        // Delete Event from Google Calendar
+        async function deleteFromGoogleCalendar(eventId) {
+            try {
+                await gapi.client.calendar.events.delete({
+                    'calendarId': 'primary',
+                    'eventId': eventId
+                });
+                console.log('Event deleted from calendar');
+            } catch (err) {
+                console.error('Error deleting from calendar:', err);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,131 +1,131 @@
 # Laundry Reminder & Tracker
 
-Aplikasi web sederhana untuk mengingatkan dan melacak jadwal laundry Anda. Ketika Anda menaruh laundry, aplikasi akan otomatis membuat reminder untuk mengambilnya 24 jam kemudian dan menyinkronkannya dengan Google Calendar.
+A simple web application to remind and track your laundry schedule. When you drop off your laundry, the app automatically creates a reminder to pick it up 24 hours later and syncs it with Google Calendar.
 
-## Fitur
+## Features
 
-- ✅ Tombol "Taruh Laundry" untuk mencatat laundry baru
-- ⏰ Countdown timer 24 jam untuk setiap laundry
-- 📊 Dashboard statistik laundry aktif dan selesai
-- 📅 Integrasi dengan Google Calendar
-- 💾 Penyimpanan lokal menggunakan localStorage
-- 📱 Responsive design dengan template Mazer
+- ✅ "Drop Off Laundry" button to record new laundry
+- ⏰ 24-hour countdown timer for each laundry
+- 📊 Statistics dashboard for active and completed laundry
+- 📅 Google Calendar integration
+- 💾 Local storage using localStorage
+- 📱 Responsive design with Mazer template
 
-## Cara Menggunakan
+## How to Use
 
 ### 1. Setup Google Calendar API
 
-Untuk mengaktifkan sinkronisasi dengan Google Calendar:
+To enable Google Calendar synchronization:
 
-1. Buka [Google Cloud Console](https://console.cloud.google.com/)
-2. Buat project baru atau pilih project yang sudah ada
-3. Aktifkan **Google Calendar API**:
-   - Di sidebar, klik "APIs & Services" > "Library"
-   - Cari "Google Calendar API"
-   - Klik "Enable"
+1. Open [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable **Google Calendar API**:
+   - In the sidebar, click "APIs & Services" > "Library"
+   - Search for "Google Calendar API"
+   - Click "Enable"
 
-4. Buat kredensial:
-   - Klik "APIs & Services" > "Credentials"
-   - Klik "Create Credentials" > "API Key"
-   - Salin API Key yang dihasilkan
+4. Create credentials:
+   - Click "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "API Key"
+   - Copy the generated API Key
 
-5. Buat OAuth 2.0 Client ID:
-   - Klik "Create Credentials" > "OAuth client ID"
-   - Pilih "Web application"
-   - Tambahkan Authorized JavaScript origins:
-     - `http://localhost:5173` (untuk development)
+5. Create OAuth 2.0 Client ID:
+   - Click "Create Credentials" > "OAuth client ID"
+   - Select "Web application"
+   - Add Authorized JavaScript origins:
+     - `http://localhost:5173` (for development)
      - `http://localhost:3000`
-     - URL production Anda
-   - Salin Client ID yang dihasilkan
+     - Your production URL
+   - Copy the generated Client ID
 
-6. Edit file `index.html` dan ganti:
+6. Edit the `index.html` file and replace:
    ```javascript
    const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
    const API_KEY = 'YOUR_API_KEY';
    ```
-   Dengan Client ID dan API Key Anda.
+   With your Client ID and API Key.
 
-### 2. Menjalankan Aplikasi
+### 2. Running the Application
 
-#### Opsi 1: Menggunakan NPM (Development)
+#### Option 1: Using NPM (Development)
 
 ```bash
 # Install dependencies
 npm install
 
-# Jalankan development server
+# Run development server
 npm run dev
 ```
 
-Aplikasi akan berjalan di `http://localhost:5173`
+The application will run at `http://localhost:5173`
 
-#### Opsi 2: Menggunakan Live Server
+#### Option 2: Using Live Server
 
-Buka file `index.html` menggunakan Live Server extension di VS Code atau web server lainnya.
+Open the `index.html` file using Live Server extension in VS Code or any other web server.
 
-#### Opsi 3: Langsung di Browser
+#### Option 3: Direct Browser Access
 
-Anda bisa langsung membuka `index.html` di browser, tapi fitur Google Calendar mungkin tidak berfungsi karena CORS policy.
+You can directly open `index.html` in a browser, but Google Calendar features may not work due to CORS policy.
 
-### 3. Menggunakan Aplikasi
+### 3. Using the Application
 
-1. **Taruh Laundry**: Klik tombol besar "Taruh Laundry" di dashboard
-2. **Pantau Countdown**: Lihat countdown timer untuk setiap laundry aktif
-3. **Sync dengan Google Calendar**: Klik tombol Google merah di pojok kanan bawah untuk sinkronisasi
-4. **Tandai Selesai**: Klik tombol "Selesai" ketika sudah mengambil laundry
-5. **Lihat Riwayat**: Scroll ke bawah untuk melihat riwayat laundry yang sudah selesai
+1. **Drop Off Laundry**: Click the large "Taruh Laundry" button on the dashboard
+2. **Monitor Countdown**: View the countdown timer for each active laundry
+3. **Sync with Google Calendar**: Click the red Google button in the bottom-right corner to synchronize
+4. **Mark as Complete**: Click the "Selesai" button when you've picked up your laundry
+5. **View History**: Scroll down to see the history of completed laundry
 
-## Struktur Proyek
+## Project Structure
 
 ```
 Laundry-Reminder-and-Tracker/
-├── index.html              # File utama aplikasi
-├── assets/                 # Assets dari template Mazer
-│   ├── compiled/          # CSS dan JS yang sudah dikompilasi
+├── index.html              # Main application file
+├── assets/                 # Assets from Mazer template
+│   ├── compiled/          # Compiled CSS and JS
 │   ├── extensions/        # Extension libraries
 │   └── static/            # Static assets
-├── layouts/               # Layout template
+├── layouts/               # Layout templates
 ├── partials/              # Partial components
 ├── package.json           # NPM dependencies
-└── README.md             # Dokumentasi ini
+└── README.md             # This documentation
 ```
 
-## Teknologi
+## Technologies
 
 - **UI Template**: [Mazer](https://github.com/zuramai/mazer) by zuramai
-- **Google Calendar API**: Untuk sinkronisasi kalender
-- **localStorage**: Untuk penyimpanan data lokal
-- **Vanilla JavaScript**: Tanpa framework, murni JavaScript
+- **Google Calendar API**: For calendar synchronization
+- **localStorage**: For local data storage
+- **Vanilla JavaScript**: Pure JavaScript without frameworks
 
 ## Troubleshooting
 
-### Google Calendar tidak tersinkronisasi
+### Google Calendar not syncing
 
-- Pastikan Anda sudah setup Client ID dan API Key dengan benar
-- Pastikan Authorized JavaScript origins sudah ditambahkan di Google Cloud Console
-- Pastikan aplikasi dijalankan melalui web server (bukan langsung buka file HTML)
-- Cek console browser untuk error messages
+- Make sure you have set up the Client ID and API Key correctly
+- Ensure Authorized JavaScript origins have been added in Google Cloud Console
+- Make sure the application is running through a web server (not directly opening the HTML file)
+- Check the browser console for error messages
 
-### Data hilang setelah refresh
+### Data lost after refresh
 
-- Data disimpan di localStorage browser
-- Jangan clear cache/cookies browser
-- Data akan hilang jika dibuka di browser yang berbeda
+- Data is stored in the browser's localStorage
+- Don't clear browser cache/cookies
+- Data will be lost if opened in a different browser
 
-## Lisensi
+## License
 
-Menggunakan template [Mazer](https://github.com/zuramai/mazer) yang merupakan open source.
+Uses the [Mazer](https://github.com/zuramai/mazer) template which is open source.
 
 ## Credits
 
-- Template UI: [Mazer](https://github.com/zuramai/mazer) by [@zuramai](https://github.com/zuramai)
+- UI Template: [Mazer](https://github.com/zuramai/mazer) by [@zuramai](https://github.com/zuramai)
 - Icons: Bootstrap Icons
 - Google Calendar API
 
-## Kontribusi
+## Contributing
 
-Silakan buat pull request atau issue jika ada bug atau saran improvement!
+Feel free to create pull requests or issues if you find bugs or have suggestions for improvements!
 
 ---
 
-Dibuat dengan ❤️ untuk memudahkan tracking laundry
+Made with ❤️ to make laundry tracking easier

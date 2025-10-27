@@ -26,6 +26,8 @@
         body {
             font-family: 'Nunito', sans-serif;
             background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
         }
 
         .navbar {
@@ -264,32 +266,265 @@
         .history-table tbody tr .bi-chevron-right {
             transform: rotate(0deg);
         }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            border-top: 2px solid #f0f0f0;
+            background-color: #fafafa;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .pagination-controls button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #ddd;
+            background-color: white;
+            color: #333;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .pagination-controls button:hover:not(:disabled) {
+            background-color: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination-controls button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .pagination-controls .page-number {
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .rows-per-page-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .rows-per-page-selector select {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            background-color: white;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .rows-per-page-selector label {
+            margin: 0;
+            font-weight: 500;
+            color: #666;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 260px;
+            background: linear-gradient(180deg, #435ebe 0%, #667eea 100%);
+            padding: 1.5rem 0;
+            z-index: 1000;
+            box-shadow: 4px 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .sidebar-brand {
+            padding: 0 1.5rem;
+            margin-bottom: 2rem;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-brand i {
+            font-size: 2rem;
+            margin-right: 0.75rem;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar-menu a.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-left: 4px solid white;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .main-content {
+            margin-left: 260px;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .content-wrapper {
+            padding: 2rem;
+        }
+
+        .navbar {
+            margin-left: 260px;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-stat {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .dashboard-stat .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .dashboard-stat .stat-label {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-dark mb-4">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">
-                <i class="bi bi-droplet-fill me-2"></i>
-                Laundry Reminder & Tracker
-            </span>
-            <div class="d-flex align-items-center">
-                <span class="text-white me-3" id="clock"></span>
-                <button class="btn btn-light btn-sm" onclick="location.reload()">
-                    <i class="bi bi-arrow-clockwise"></i>
-                </button>
-            </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="bi bi-droplet-fill"></i>
+            <span>Laundry App</span>
         </div>
-    </nav>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="#" onclick="navigateTo('order')" id="menu-order" class="active">
+                    <i class="bi bi-cart-plus"></i>
+                    <span>Laundry Order</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="navigateTo('dashboard')" id="menu-dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" onclick="navigateTo('shops')" id="menu-shops">
+                    <i class="bi bi-shop"></i>
+                    <span>Manage Shops</span>
+                </a>
+            </li>
+        </ul>
+    </div>
 
-    <div class="container">
-        <!-- Page Heading -->
-        <div class="page-heading text-center">
-            <h2 class="fw-bold">Laundry Dashboard</h2>
-            <p class="text-muted">Manage your laundry schedule easily</p>
-        </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar navbar-dark mb-0">
+            <div class="container-fluid">
+                <span class="navbar-brand mb-0 h1" id="page-title">
+                    <i class="bi bi-cart-plus me-2"></i>
+                    Laundry Order
+                </span>
+                <div class="d-flex align-items-center">
+                    <div class="dropdown me-3">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" id="timezoneDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-clock me-1"></i>
+                            <span id="clock">00:00:00</span>
+                            <small class="ms-1" id="timezone-label">UTC+7</small>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="timezoneDropdown">
+                            <li><h6 class="dropdown-header">Select Timezone</h6></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTimezone('system')">
+                                <i class="bi bi-laptop me-2"></i>System Time
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTimezone('utc+7')">
+                                <i class="bi bi-globe-asia-australia me-2"></i>UTC+7 (Jakarta)
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTimezone('utc+8')">
+                                <i class="bi bi-globe-asia-australia me-2"></i>UTC+8 (Singapore)
+                            </a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTimezone('utc+0')">
+                                <i class="bi bi-globe me-2"></i>UTC+0 (London)
+                            </a></li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-light btn-sm" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Order Page -->
+        <div id="page-order" class="page-section active">
+            <div class="content-wrapper">
+                <div class="container-fluid">
+                    <!-- Page Heading -->
+                    <div class="page-heading text-center">
+                        <h2 class="fw-bold">Laundry Order</h2>
+                        <p class="text-muted">Choose which laundry shop to drop off your clothes</p>
+                    </div>
 
         <!-- Main Actions & Stats -->
         <div class="row mb-4">
@@ -414,12 +649,153 @@
                 </div>
             </div>
         </div>
+
+        <!-- Sync Google Calendar Button -->
+        <button class="btn btn-danger btn-sync" id="sync-btn" onclick="syncGoogleCalendar()" title="Sync with Google Calendar">
+            <i class="bi bi-google" style="font-size: 1.75rem;"></i>
+        </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="page-dashboard" class="page-section">
+            <div class="content-wrapper">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <h3 class="mb-3">Overview</h3>
+                    </div>
+                </div>
+                <div class="row" id="dashboard-stats">
+                    <!-- Dashboard content will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Shops Page -->
+        <div id="page-shops" class="page-section">
+            <div class="content-wrapper">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-shop me-2"></i>Laundry Shop Management
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="text-muted mb-4">
+                                        Manage the laundry shops/services where you drop off your clothes. These are the physical locations of laundry businesses, not your personal location.
+                                    </p>
+
+                                    <!-- Manage Shops Card -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                            <span><strong>My Laundry Shops</strong></span>
+                                            <button class="btn btn-sm btn-primary" onclick="showAddLocationForm()">
+                                                <i class="bi bi-plus-circle me-1"></i>Add Shop
+                                            </button>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="addLocationForm" style="display: none;" class="mb-3">
+                                                <label class="form-label small text-muted">Enter the name of the laundry shop</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><i class="bi bi-shop"></i></span>
+                                                    <input type="text" class="form-control" id="newLocationName" placeholder="e.g., Express Laundry, QuickWash, Laundry 24">
+                                                    <button class="btn btn-success" onclick="addLocation()">
+                                                        <i class="bi bi-check-lg"></i> Save
+                                                    </button>
+                                                    <button class="btn btn-secondary" onclick="cancelAddLocation()">Cancel</button>
+                                                </div>
+                                            </div>
+                                            <div id="locationsList">
+                                                <!-- Shop list will be populated here -->
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Shop Selection Preferences -->
+                                    <div class="card">
+                                        <div class="card-header bg-light">
+                                            <strong>Shop Selection Preferences</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            <label class="form-label small text-muted mb-3">How would you like to select which laundry shop to use?</label>
+                                            <div class="mb-3">
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="radio" name="locationMode" id="locationModeDefault" value="default" onchange="updateLocationMode('default')">
+                                                    <label class="form-check-label" for="locationModeDefault">
+                                                        <strong>Always use my default shop</strong>
+                                                        <div class="small text-muted">Quick drop-off without choosing each time</div>
+                                                    </label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="locationMode" id="locationModeAsk" value="ask" onchange="updateLocationMode('ask')">
+                                                    <label class="form-check-label" for="locationModeAsk">
+                                                        <strong>Ask me which shop every time</strong>
+                                                        <div class="small text-muted">Choose a different shop for each drop-off</div>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="mt-3" id="defaultLocationSection">
+                                                <label for="defaultLocation" class="form-label small text-muted">Default Laundry Shop</label>
+                                                <select class="form-select" id="defaultLocation" onchange="updateDefaultLocation()">
+                                                    <option value="">Select your default shop...</option>
+                                                </select>
+                                                <div class="form-text">This shop will be used automatically if you select "Always use default"</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Sync Google Calendar Button -->
-    <button class="btn btn-danger btn-sync" id="sync-btn" onclick="syncGoogleCalendar()" title="Sync with Google Calendar">
-        <i class="bi bi-google" style="font-size: 1.75rem;"></i>
-    </button>
+
+    <!-- Location Selector Modal -->
+    <div class="modal fade" id="locationSelectorModal" tabindex="-1" aria-labelledby="locationSelectorModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="locationSelectorModalLabel">
+                        <i class="bi bi-shop me-2"></i>Select Laundry Shop
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Choose your laundry shop</strong><br>
+                        <small>Select which laundry service/shop you're using for this drop-off</small>
+                    </div>
+                    <label for="selectedLocation" class="form-label">
+                        <i class="bi bi-geo-alt-fill me-1"></i>Laundry Shop
+                    </label>
+                    <select class="form-select form-select-lg" id="selectedLocation">
+                        <option value="">-- Choose a laundry shop --</option>
+                    </select>
+                    <div class="form-text mt-2">
+                        <i class="bi bi-lightbulb me-1"></i>
+                        Don't see your shop? Add it in <a href="#" onclick="openSettingsFromSelector()">Settings</a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>Cancel
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="confirmDropOff()">
+                        <i class="bi bi-check-lg me-1"></i>Confirm Drop Off
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -428,6 +804,20 @@
         // Data Storage
         let laundryData = JSON.parse(localStorage.getItem('laundryData')) || [];
         let googleCalendarConnected = localStorage.getItem('googleCalendarConnected') === 'true';
+        let laundryLocations = JSON.parse(localStorage.getItem('laundryLocations')) || ['Laundry Express'];
+        let locationMode = localStorage.getItem('locationMode') || 'ask'; // 'default' or 'ask'
+        let defaultLocation = localStorage.getItem('defaultLocation') || '';
+        let currentTimezone = localStorage.getItem('currentTimezone') || 'utc+7';
+
+        // Pagination Settings
+        let currentPage = parseInt(localStorage.getItem('currentPage')) || 1;
+        let rowsPerPage = parseInt(localStorage.getItem('rowsPerPage')) || 5;
+
+        // Dashboard Data
+        let dashboardData = null;
+
+        // Current Page
+        let currentPageName = localStorage.getItem('currentPageName') || 'order';
 
         // Google Calendar Config
         const CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com';
@@ -439,14 +829,221 @@
         let gapiInited = false;
         let gisInited = false;
 
+        // Page Navigation
+        function navigateTo(pageName) {
+            // Hide all pages
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Remove active class from all menu items
+            document.querySelectorAll('.sidebar-menu a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(`page-${pageName}`).classList.add('active');
+            document.getElementById(`menu-${pageName}`).classList.add('active');
+
+            // Update page title
+            const titles = {
+                'dashboard': '<i class="bi bi-speedometer2 me-2"></i>Dashboard',
+                'order': '<i class="bi bi-cart-plus me-2"></i>Laundry Order',
+                'shops': '<i class="bi bi-shop me-2"></i>Manage Shops'
+            };
+            document.getElementById('page-title').innerHTML = titles[pageName];
+
+            // Save current page
+            currentPageName = pageName;
+            localStorage.setItem('currentPageName', pageName);
+
+            // Load page-specific content
+            if (pageName === 'dashboard') {
+                loadDashboard();
+            } else if (pageName === 'order') {
+                updateUI();
+            } else if (pageName === 'shops') {
+                loadSettingsUI();
+            }
+
+            return false; // Prevent default link behavior
+        }
+
+        // Load Dashboard
+        async function loadDashboard() {
+            try {
+                // Try multiple paths
+                let response;
+                try {
+                    response = await fetch('./dashboard-data.json');
+                } catch (e) {
+                    try {
+                        response = await fetch('/dashboard-data.json');
+                    } catch (e2) {
+                        response = await fetch('/src/dashboard-data.json');
+                    }
+                }
+
+                dashboardData = await response.json();
+                renderDashboard();
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+
+                // Use fallback data if fetch fails
+                dashboardData = {
+                    "overview": {
+                        "totalOrders": 156,
+                        "activeOrders": 12,
+                        "completedOrders": 144,
+                        "totalRevenue": 15600000
+                    },
+                    "topShops": [
+                        {"name": "Laundry Express", "orders": 78, "rating": 4.8},
+                        {"name": "QuickWash 24", "orders": 45, "rating": 4.6},
+                        {"name": "Premium Laundry", "orders": 33, "rating": 4.9}
+                    ],
+                    "popularServices": [
+                        {"name": "Regular Wash", "count": 89, "percentage": 57},
+                        {"name": "Express Wash", "count": 42, "percentage": 27},
+                        {"name": "Dry Clean", "count": 25, "percentage": 16}
+                    ],
+                    "recentActivity": [
+                        {"id": "1761534512584", "action": "Order Completed", "shop": "Laundry Express", "time": "2 hours ago", "status": "completed"},
+                        {"id": "1761523401234", "action": "New Order", "shop": "QuickWash 24", "time": "5 hours ago", "status": "active"},
+                        {"id": "1761512290123", "action": "Order Completed", "shop": "Premium Laundry", "time": "1 day ago", "status": "completed"}
+                    ]
+                };
+                renderDashboard();
+            }
+        }
+
+        // Render Dashboard
+        function renderDashboard() {
+            if (!dashboardData) return;
+
+            const container = document.getElementById('dashboard-stats');
+            const data = dashboardData.overview;
+
+            container.innerHTML = `
+                <!-- Stats Cards -->
+                <div class="col-md-3 mb-4">
+                    <div class="dashboard-card">
+                        <div class="dashboard-stat">
+                            <i class="bi bi-cart-check" style="font-size: 3rem; color: var(--primary-color);"></i>
+                            <div class="stat-value">${data.totalOrders}</div>
+                            <div class="stat-label">Total Orders</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="dashboard-card">
+                        <div class="dashboard-stat">
+                            <i class="bi bi-hourglass-split" style="font-size: 3rem; color: #f59e0b;"></i>
+                            <div class="stat-value">${data.activeOrders}</div>
+                            <div class="stat-label">Active Orders</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="dashboard-card">
+                        <div class="dashboard-stat">
+                            <i class="bi bi-check-circle" style="font-size: 3rem; color: var(--success-color);"></i>
+                            <div class="stat-value">${data.completedOrders}</div>
+                            <div class="stat-label">Completed Orders</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-4">
+                    <div class="dashboard-card">
+                        <div class="dashboard-stat">
+                            <i class="bi bi-currency-dollar" style="font-size: 3rem; color: #10b981;"></i>
+                            <div class="stat-value">Rp${(data.totalRevenue / 1000000).toFixed(1)}M</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Shops -->
+                <div class="col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <h5 class="mb-3"><i class="bi bi-shop me-2"></i>Top Laundry Shops</h5>
+                        <div class="list-group">
+                            ${dashboardData.topShops.map(shop => `
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>${shop.name}</strong>
+                                        <div class="small text-muted">${shop.orders} orders</div>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-star-fill"></i> ${shop.rating}
+                                        </span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Services -->
+                <div class="col-md-6 mb-4">
+                    <div class="dashboard-card">
+                        <h5 class="mb-3"><i class="bi bi-bar-chart me-2"></i>Popular Services</h5>
+                        ${dashboardData.popularServices.map(service => `
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span><strong>${service.name}</strong></span>
+                                    <span class="text-muted">${service.count} orders (${service.percentage}%)</span>
+                                </div>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: ${service.percentage}%"
+                                         aria-valuenow="${service.percentage}" aria-valuemin="0" aria-valuemax="100">
+                                        ${service.percentage}%
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="col-12 mb-4">
+                    <div class="dashboard-card">
+                        <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i>Recent Activity</h5>
+                        <div class="list-group">
+                            ${dashboardData.recentActivity.map(activity => `
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>${activity.action}</strong> - ${activity.shop}
+                                            <div class="small text-muted">Order #${activity.id}</div>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge ${activity.status === 'completed' ? 'bg-success' : 'bg-warning'}">
+                                                ${activity.status}
+                                            </span>
+                                            <div class="small text-muted mt-1">${activity.time}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadLaundryData();
-            updateUI();
             startCountdownTimer();
             startClock();
             loadGoogleAPI();
             updateSyncButton();
+            loadSettings();
+
+            // Navigate to saved page or dashboard
+            navigateTo(currentPageName);
 
             // Add click event listeners
             const addBtn = document.getElementById('add-laundry-button');
@@ -486,10 +1083,27 @@
         function startClock() {
             function updateClock() {
                 const now = new Date();
-                const timeString = now.toLocaleTimeString('id-ID', {
+                let displayTime;
+
+                if (currentTimezone === 'system') {
+                    displayTime = now;
+                } else {
+                    // Calculate timezone offset
+                    const offsets = {
+                        'utc+0': 0,
+                        'utc+7': 7 * 60,
+                        'utc+8': 8 * 60
+                    };
+                    const targetOffset = offsets[currentTimezone] || 7 * 60;
+                    const userOffset = now.getTimezoneOffset();
+                    displayTime = new Date(now.getTime() + (targetOffset + userOffset) * 60 * 1000);
+                }
+
+                const timeString = displayTime.toLocaleTimeString('en-US', {
                     hour: '2-digit',
                     minute: '2-digit',
-                    second: '2-digit'
+                    second: '2-digit',
+                    hour12: false
                 });
                 document.getElementById('clock').textContent = timeString;
             }
@@ -497,12 +1111,54 @@
             setInterval(updateClock, 1000);
         }
 
+        // Timezone Management
+        function setTimezone(tz) {
+            currentTimezone = tz;
+            localStorage.setItem('currentTimezone', tz);
+
+            const labels = {
+                'system': 'System',
+                'utc+7': 'UTC+7',
+                'utc+8': 'UTC+8',
+                'utc+0': 'UTC+0'
+            };
+            document.getElementById('timezone-label').textContent = labels[tz] || 'UTC+7';
+            showToast('success', `Timezone changed to ${labels[tz]}`);
+        }
+
         // Add Laundry
         function addLaundry() {
             try {
                 console.log('addLaundry called'); // Debug log
 
-                // Get current time in Jakarta timezone
+                // Check if locations exist
+                if (laundryLocations.length === 0) {
+                    showToast('error', 'Please add at least one laundry shop in Settings first.');
+                    openSettingsModal();
+                    return;
+                }
+
+                // Check location mode
+                if (locationMode === 'ask') {
+                    // Show location selector modal
+                    populateLocationSelector();
+                    const modal = new bootstrap.Modal(document.getElementById('locationSelectorModal'));
+                    modal.show();
+                } else {
+                    // Use default location
+                    const location = defaultLocation || laundryLocations[0];
+                    createLaundryRecord(location);
+                }
+            } catch (error) {
+                console.error('Error in addLaundry:', error);
+                alert('Error adding laundry: ' + error.message);
+            }
+        }
+
+        // Create Laundry Record
+        function createLaundryRecord(location) {
+            try {
+                // Get current time in selected timezone
                 const now = new Date();
                 const jakartaOffset = 7 * 60; // UTC+7 in minutes
                 const userOffset = now.getTimezoneOffset(); // User's timezone offset
@@ -518,9 +1174,8 @@
                     status: 'active',
                     synced: false,
                     calendarEventId: null,
-                    // Dummy data
                     weight: '5 kg',
-                    location: 'Laundry Express'
+                    location: location
                 };
 
                 console.log('New laundry item:', laundryItem); // Debug log
@@ -534,11 +1189,54 @@
                     addToGoogleCalendar(laundryItem);
                 }
 
-                showToast('success', 'Laundry added successfully! Reminder will appear in 24 hours.');
+                showToast('success', `Laundry added successfully at ${location}! Reminder will appear in 24 hours.`);
             } catch (error) {
-                console.error('Error in addLaundry:', error);
-                alert('Error adding laundry: ' + error.message);
+                console.error('Error in createLaundryRecord:', error);
+                alert('Error creating laundry record: ' + error.message);
             }
+        }
+
+        // Confirm Drop Off from Modal
+        function confirmDropOff() {
+            const selectedLocation = document.getElementById('selectedLocation').value;
+            if (!selectedLocation) {
+                showToast('error', 'Please select a laundry shop');
+                return;
+            }
+
+            createLaundryRecord(selectedLocation);
+
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('locationSelectorModal'));
+            modal.hide();
+        }
+
+        // Populate Location Selector
+        function populateLocationSelector() {
+            const select = document.getElementById('selectedLocation');
+            select.innerHTML = '<option value="">-- Choose a laundry shop --</option>';
+            laundryLocations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                select.appendChild(option);
+            });
+        }
+
+        // Open Settings from Location Selector
+        function openSettingsFromSelector() {
+            // Close location selector modal
+            const locModal = bootstrap.Modal.getInstance(document.getElementById('locationSelectorModal'));
+            if (locModal) {
+                locModal.hide();
+            }
+
+            // Navigate to shops page
+            setTimeout(() => {
+                navigateTo('shops');
+            }, 300);
+
+            return false; // Prevent default link behavior
         }
 
         // Pick up Latest Laundry (Big Button)
@@ -631,7 +1329,7 @@
                 activeContainer.innerHTML = activeLaundry.map(item => createLaundryCard(item)).join('');
             }
 
-            // Update history
+            // Update history with pagination
             const historyContainer = document.getElementById('history-laundry');
             if (completedLaundry.length === 0) {
                 historyContainer.innerHTML = `
@@ -641,6 +1339,21 @@
                     </div>
                 `;
             } else {
+                // Reverse the array to show newest first
+                const reversedHistory = [...completedLaundry].reverse();
+
+                // Calculate pagination
+                const totalPages = Math.ceil(reversedHistory.length / rowsPerPage);
+                const startIndex = (currentPage - 1) * rowsPerPage;
+                const endIndex = startIndex + rowsPerPage;
+                const paginatedHistory = reversedHistory.slice(startIndex, endIndex);
+
+                // Ensure currentPage is valid
+                if (currentPage > totalPages && totalPages > 0) {
+                    currentPage = totalPages;
+                    localStorage.setItem('currentPage', currentPage);
+                }
+
                 historyContainer.innerHTML = `
                     <table class="history-table table table-hover mb-0">
                         <thead>
@@ -654,9 +1367,39 @@
                             </tr>
                         </thead>
                         <tbody>
-                            ${completedLaundry.slice(-10).reverse().map((item, index) => createHistoryTableRow(item, index)).join('')}
+                            ${paginatedHistory.map((item, index) => createHistoryTableRow(item, startIndex + index)).join('')}
                         </tbody>
                     </table>
+                    <div class="pagination-container">
+                        <div class="rows-per-page-selector">
+                            <label for="rowsPerPageSelect">Rows per page:</label>
+                            <select id="rowsPerPageSelect" onchange="changeRowsPerPage(this.value)">
+                                <option value="5" ${rowsPerPage === 5 ? 'selected' : ''}>5</option>
+                                <option value="10" ${rowsPerPage === 10 ? 'selected' : ''}>10</option>
+                                <option value="15" ${rowsPerPage === 15 ? 'selected' : ''}>15</option>
+                                <option value="20" ${rowsPerPage === 20 ? 'selected' : ''}>20</option>
+                                <option value="50" ${rowsPerPage === 50 ? 'selected' : ''}>50</option>
+                            </select>
+                        </div>
+                        <div class="pagination-controls">
+                            <button onclick="goToPage(1)" ${currentPage === 1 ? 'disabled' : ''}>
+                                <i class="bi bi-chevron-bar-left"></i> First
+                            </button>
+                            <button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                                <i class="bi bi-chevron-left"></i> Previous
+                            </button>
+                            <span class="page-number">Page ${currentPage} of ${totalPages}</span>
+                            <button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                                Next <i class="bi bi-chevron-right"></i>
+                            </button>
+                            <button onclick="goToPage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}>
+                                Last <i class="bi bi-chevron-bar-right"></i>
+                            </button>
+                        </div>
+                        <div class="text-muted small">
+                            Showing ${startIndex + 1}-${Math.min(endIndex, reversedHistory.length)} of ${reversedHistory.length} records
+                        </div>
+                    </div>
                 `;
             }
 
@@ -710,48 +1453,50 @@
                     <td colspan="6" class="p-0">
                         <div class="history-details" id="${detailsId}-content">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <h6 class="text-muted mb-2">
                                         <i class="bi bi-box-arrow-in-down me-2"></i>
                                         Drop Off Time
                                     </h6>
                                     <p class="mb-0 fw-semibold">${formatDateTime(startTime)}</p>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <h6 class="text-muted mb-2">
                                         <i class="bi bi-clock me-2"></i>
                                         Scheduled Pick Up
                                     </h6>
                                     <p class="mb-0 fw-semibold">${formatDateTime(pickupTime)}</p>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-3">
                                     <h6 class="text-muted mb-2">
                                         <i class="bi bi-box-arrow-up me-2"></i>
                                         Actual Pick Up
                                     </h6>
                                     <p class="mb-0 fw-semibold">${completedTime ? formatDateTime(completedTime) : '-'}</p>
                                 </div>
+                                ${item.weight ? `
+                                    <div class="col-md-3">
+                                        <h6 class="text-muted mb-2">
+                                            <i class="bi bi-boxes me-2"></i>
+                                            Weight
+                                        </h6>
+                                        <p class="mb-0">${item.weight}</p>
+                                    </div>
+                                ` : ''}
                             </div>
-                            ${item.weight || item.location ? `
+                            ${item.location ? `
                                 <div class="row mt-3">
-                                    ${item.weight ? `
-                                        <div class="col-md-6">
-                                            <h6 class="text-muted mb-2">
-                                                <i class="bi bi-boxes me-2"></i>
-                                                Weight
-                                            </h6>
-                                            <p class="mb-0">${item.weight}</p>
-                                        </div>
-                                    ` : ''}
-                                    ${item.location ? `
-                                        <div class="col-md-6">
-                                            <h6 class="text-muted mb-2">
-                                                <i class="bi bi-geo-alt me-2"></i>
-                                                Location
-                                            </h6>
-                                            <p class="mb-0">${item.location}</p>
-                                        </div>
-                                    ` : ''}
+                                    <div class="col-12">
+                                        <h6 class="text-muted mb-2">
+                                            <i class="bi bi-shop me-2"></i>
+                                            Laundry Shop
+                                        </h6>
+                                        <p class="mb-0">
+                                            <span class="badge bg-primary" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                                                <i class="bi bi-geo-alt-fill me-2"></i>${item.location}
+                                            </span>
+                                        </p>
+                                    </div>
                                 </div>
                             ` : ''}
                         </div>
@@ -801,7 +1546,7 @@
                                 Laundry #${item.id}
                                 ${item.synced ? '<i class="bi bi-google text-danger ms-2" title="Synced to Google Calendar"></i>' : ''}
                             </h5>
-                            <div class="row">
+                            <div class="row mb-2">
                                 <div class="col-md-6">
                                     <small class="text-muted">
                                         <i class="bi bi-box-arrow-in-down me-1"></i>
@@ -815,6 +1560,14 @@
                                     </small>
                                 </div>
                             </div>
+                            ${item.location ? `
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="bi bi-shop me-1"></i>
+                                        <strong>Laundry Shop:</strong> <span class="text-primary fw-semibold">${item.location}</span>
+                                    </small>
+                                </div>
+                            ` : ''}
                             ${isActive ? `
                                 <div class="countdown mt-3" id="countdown-${item.id}"></div>
                             ` : `
@@ -912,6 +1665,160 @@
                 saveLaundryData(); // Save the fixed data
                 console.log('Loaded laundry data:', laundryData);
             }
+        }
+
+        // Settings Management
+        function openSettingsModal() {
+            navigateTo('shops');
+        }
+
+        function loadSettings() {
+            // Set timezone label on load
+            const labels = {
+                'system': 'System',
+                'utc+7': 'UTC+7',
+                'utc+8': 'UTC+8',
+                'utc+0': 'UTC+0'
+            };
+            document.getElementById('timezone-label').textContent = labels[currentTimezone] || 'UTC+7';
+        }
+
+        function loadSettingsUI() {
+            // Load location mode
+            document.getElementById('locationModeDefault').checked = (locationMode === 'default');
+            document.getElementById('locationModeAsk').checked = (locationMode === 'ask');
+
+            // Populate default location dropdown
+            updateDefaultLocationDropdown();
+
+            // Display locations list
+            updateLocationsList();
+        }
+
+        function updateLocationMode(mode) {
+            locationMode = mode;
+            localStorage.setItem('locationMode', mode);
+            showToast('success', `Shop selection mode: ${mode === 'default' ? 'Always use default shop' : 'Ask which shop every time'}`);
+        }
+
+        function updateDefaultLocation() {
+            defaultLocation = document.getElementById('defaultLocation').value;
+            localStorage.setItem('defaultLocation', defaultLocation);
+            showToast('success', `Default laundry shop: ${defaultLocation}`);
+        }
+
+        function updateDefaultLocationDropdown() {
+            const select = document.getElementById('defaultLocation');
+            select.innerHTML = '<option value="">Select default location...</option>';
+            laundryLocations.forEach(loc => {
+                const option = document.createElement('option');
+                option.value = loc;
+                option.textContent = loc;
+                if (loc === defaultLocation) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+        }
+
+        function updateLocationsList() {
+            const container = document.getElementById('locationsList');
+            if (laundryLocations.length === 0) {
+                container.innerHTML = '<div class="alert alert-warning mb-0"><i class="bi bi-exclamation-triangle me-2"></i>No laundry shops added yet. Click "Add Shop" to get started.</div>';
+                return;
+            }
+
+            container.innerHTML = '<div class="list-group">' + laundryLocations.map((loc, index) => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <i class="bi bi-shop me-2 text-primary"></i>
+                        <strong>${loc}</strong>
+                        ${loc === defaultLocation ? '<span class="badge bg-primary ms-2"><i class="bi bi-star-fill"></i> Default</span>' : ''}
+                    </div>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteLocation(${index})" title="Delete this shop">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `).join('') + '</div>';
+        }
+
+        function showAddLocationForm() {
+            document.getElementById('addLocationForm').style.display = 'block';
+            document.getElementById('newLocationName').focus();
+        }
+
+        function cancelAddLocation() {
+            document.getElementById('addLocationForm').style.display = 'none';
+            document.getElementById('newLocationName').value = '';
+        }
+
+        function addLocation() {
+            const newLocation = document.getElementById('newLocationName').value.trim();
+            if (!newLocation) {
+                showToast('error', 'Please enter a laundry shop name');
+                return;
+            }
+
+            if (laundryLocations.includes(newLocation)) {
+                showToast('error', 'This shop already exists in your list');
+                return;
+            }
+
+            laundryLocations.push(newLocation);
+            localStorage.setItem('laundryLocations', JSON.stringify(laundryLocations));
+
+            // Set as default if it's the first location
+            if (laundryLocations.length === 1) {
+                defaultLocation = newLocation;
+                localStorage.setItem('defaultLocation', defaultLocation);
+                showToast('success', `"${newLocation}" added and set as default shop`);
+            } else {
+                showToast('success', `"${newLocation}" added to your laundry shops`);
+            }
+
+            cancelAddLocation();
+            loadSettingsUI();
+        }
+
+        function deleteLocation(index) {
+            const locationToDelete = laundryLocations[index];
+            if (!confirm(`Are you sure you want to remove "${locationToDelete}" from your laundry shops?`)) return;
+
+            laundryLocations.splice(index, 1);
+            localStorage.setItem('laundryLocations', JSON.stringify(laundryLocations));
+
+            // If deleted location was default, set new default
+            if (locationToDelete === defaultLocation) {
+                defaultLocation = laundryLocations.length > 0 ? laundryLocations[0] : '';
+                localStorage.setItem('defaultLocation', defaultLocation);
+            }
+
+            loadSettingsUI();
+            showToast('info', `"${locationToDelete}" removed from your shops`);
+        }
+
+        // Pagination Functions
+        function goToPage(page) {
+            const completedLaundry = laundryData.filter(l => l.status === 'completed');
+            const totalPages = Math.ceil(completedLaundry.length / rowsPerPage);
+
+            if (page < 1 || page > totalPages) return;
+
+            currentPage = page;
+            localStorage.setItem('currentPage', currentPage);
+            updateUI();
+        }
+
+        function changeRowsPerPage(value) {
+            rowsPerPage = parseInt(value);
+            localStorage.setItem('rowsPerPage', rowsPerPage);
+
+            // Reset to page 1 when changing rows per page
+            currentPage = 1;
+            localStorage.setItem('currentPage', currentPage);
+
+            updateUI();
+            showToast('success', `Showing ${rowsPerPage} rows per page`);
         }
 
         // Show Toast

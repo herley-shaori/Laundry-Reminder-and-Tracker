@@ -39,16 +39,35 @@
 
         .laundry-button {
             min-height: 180px;
-            cursor: pointer;
+            cursor: pointer !important;
             transition: all 0.3s ease;
             border: none;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            position: relative;
+            z-index: 1;
+            user-select: none;
         }
 
         .laundry-button:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        #pickup-button {
+            position: relative;
+            z-index: 1;
+            user-select: none;
+        }
+
+        #pickup-button:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(6, 208, 1, 0.4);
+        }
+
+        #pickup-button[style*="opacity: 0.6"]:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .stats-card {
@@ -177,12 +196,73 @@
             padding: 3rem;
             text-align: center;
             color: #999;
+            background-color: white;
         }
 
         .empty-state i {
             font-size: 4rem;
             margin-bottom: 1rem;
             opacity: 0.3;
+        }
+
+        .history-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .history-table thead th {
+            border-bottom: 2px solid #e0e0e0;
+            padding: 1rem;
+            font-weight: 600;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+
+        .history-table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .history-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .history-table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .history-details {
+            display: none;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-left: 4px solid #198754;
+            margin: 0.5rem 0;
+        }
+
+        .history-details.show {
+            display: block;
+        }
+
+        .history-row.expanded {
+            background-color: #f8f9fa;
+        }
+
+        .history-table tbody tr i[id^="chevron-"] {
+            transition: transform 0.3s ease;
+        }
+
+        .history-table tbody tr .bi-chevron-down {
+            transform: rotate(0deg);
+        }
+
+        .history-table tbody tr .bi-chevron-right {
+            transform: rotate(0deg);
         }
     </style>
 </head>
@@ -207,65 +287,78 @@
     <div class="container">
         <!-- Page Heading -->
         <div class="page-heading text-center">
-            <h2 class="fw-bold">Dashboard Laundry</h2>
-            <p class="text-muted">Kelola jadwal laundry kamu dengan mudah</p>
+            <h2 class="fw-bold">Laundry Dashboard</h2>
+            <p class="text-muted">Manage your laundry schedule easily</p>
         </div>
 
         <!-- Main Actions & Stats -->
         <div class="row mb-4">
-            <!-- Tombol Taruh Laundry -->
-            <div class="col-12 col-lg-6 mb-4">
-                <div class="card laundry-button h-100" onclick="addLaundry()">
+            <!-- Add Laundry Button -->
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card laundry-button h-100" id="add-laundry-button">
                     <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
                         <i class="bi bi-plus-circle mb-3" style="font-size: 4rem;"></i>
-                        <h3 class="fw-bold mb-2">Taruh Laundry</h3>
-                        <p class="mb-0">Klik untuk mencatat laundry baru</p>
+                        <h3 class="fw-bold mb-2">Drop Off Laundry</h3>
+                        <p class="mb-0">Click to add new laundry</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Statistik -->
-            <div class="col-12 col-lg-6">
-                <div class="row mb-3">
-                    <div class="col-6">
-                        <div class="card stats-card h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="stats-icon blue me-3">
-                                        <i class="bi bi-clock-history"></i>
-                                    </div>
-                                    <div>
-                                        <small class="text-muted d-block">Laundry Aktif</small>
-                                        <h3 class="fw-bold mb-0" id="active-count">0</h3>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <!-- Pickup Laundry Button -->
+            <div class="col-12 col-md-6 mb-3">
+                <div class="card h-100" id="pickup-button"
+                     style="min-height: 180px; cursor: pointer; transition: all 0.3s ease; border: none; background: linear-gradient(135deg, #06d001 0%, #00a65a 100%); color: white;">
+                    <div class="card-body text-center d-flex flex-column align-items-center justify-content-center">
+                        <i class="bi bi-box-arrow-up mb-3" style="font-size: 4rem;"></i>
+                        <h3 class="fw-bold mb-2">Pick Up Laundry</h3>
+                        <p class="mb-0" id="pickup-button-text">No active laundry</p>
                     </div>
-                    <div class="col-6">
-                        <div class="card stats-card h-100">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center">
-                                    <div class="stats-icon green me-3">
-                                        <i class="bi bi-check-circle"></i>
-                                    </div>
-                                    <div>
-                                        <small class="text-muted d-block">Selesai</small>
-                                        <h3 class="fw-bold mb-0" id="completed-count">0</h3>
-                                    </div>
-                                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <!-- Stats -->
+            <div class="col-md-6 mb-3">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-icon blue me-3">
+                                <i class="bi bi-clock-history"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Active Laundry</small>
+                                <h3 class="fw-bold mb-0" id="active-count">0</h3>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="card stats-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="stats-icon green me-3">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div>
+                                <small class="text-muted d-block">Completed</small>
+                                <h3 class="fw-bold mb-0" id="completed-count">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 mb-3">
                 <div class="card stats-card">
                     <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between">
                             <div>
-                                <small class="text-muted d-block mb-2">Status Sinkronisasi</small>
+                                <small class="text-muted d-block mb-2">Sync Status</small>
                                 <div class="d-flex align-items-center">
                                     <i class="bi bi-google text-danger me-2" style="font-size: 1.5rem;"></i>
-                                    <span id="sync-status" class="fw-semibold">Belum tersinkronisasi</span>
+                                    <span id="sync-status" class="fw-semibold">Not synced</span>
                                 </div>
                             </div>
                             <button class="btn btn-sm btn-primary" onclick="syncGoogleCalendar()">
@@ -278,21 +371,21 @@
             </div>
         </div>
 
-        <!-- Laundry Aktif -->
+        <!-- Active Laundry -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
                             <i class="bi bi-hourglass-split me-2"></i>
-                            Laundry Aktif
+                            Active Laundry
                         </h5>
                     </div>
                     <div class="card-body">
                         <div id="active-laundry">
                             <div class="empty-state">
                                 <i class="bi bi-inbox"></i>
-                                <p class="mb-0">Tidak ada laundry aktif</p>
+                                <p class="mb-0">No active laundry</p>
                             </div>
                         </div>
                     </div>
@@ -300,21 +393,21 @@
             </div>
         </div>
 
-        <!-- Riwayat -->
+        <!-- History -->
         <div class="row mb-5">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="mb-0">
                             <i class="bi bi-clock-history me-2"></i>
-                            Riwayat Laundry
+                            Laundry History
                         </h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-0">
                         <div id="history-laundry">
                             <div class="empty-state">
                                 <i class="bi bi-archive"></i>
-                                <p class="mb-0">Belum ada riwayat</p>
+                                <p class="mb-0">No history yet</p>
                             </div>
                         </div>
                     </div>
@@ -323,8 +416,8 @@
         </div>
     </div>
 
-    <!-- Tombol Sync Google Calendar -->
-    <button class="btn btn-danger btn-sync" id="sync-btn" onclick="syncGoogleCalendar()" title="Sync dengan Google Calendar">
+    <!-- Sync Google Calendar Button -->
+    <button class="btn btn-danger btn-sync" id="sync-btn" onclick="syncGoogleCalendar()" title="Sync with Google Calendar">
         <i class="bi bi-google" style="font-size: 1.75rem;"></i>
     </button>
 
@@ -354,6 +447,39 @@
             startClock();
             loadGoogleAPI();
             updateSyncButton();
+
+            // Add click event listeners
+            const addBtn = document.getElementById('add-laundry-button');
+            const pickupBtn = document.getElementById('pickup-button');
+
+            console.log('Add button:', addBtn);
+            console.log('Pickup button:', pickupBtn);
+
+            if (addBtn) {
+                addBtn.style.cursor = 'pointer';
+                addBtn.addEventListener('click', function(e) {
+                    console.log('Add button clicked!', e);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    addLaundry();
+                }, true);
+                console.log('Add button listener attached');
+            } else {
+                console.error('Add button not found!');
+            }
+
+            if (pickupBtn) {
+                pickupBtn.style.cursor = 'pointer';
+                pickupBtn.addEventListener('click', function(e) {
+                    console.log('Pickup button clicked!', e);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    pickupLatestLaundry();
+                }, true);
+                console.log('Pickup button listener attached');
+            } else {
+                console.error('Pickup button not found!');
+            }
         });
 
         // Clock
@@ -373,28 +499,68 @@
 
         // Add Laundry
         function addLaundry() {
-            const now = new Date();
-            const pickupTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 jam dari sekarang
+            try {
+                console.log('addLaundry called'); // Debug log
 
-            const laundryItem = {
-                id: Date.now(),
-                startTime: now.toISOString(),
-                pickupTime: pickupTime.toISOString(),
-                status: 'active',
-                synced: false,
-                calendarEventId: null
-            };
+                // Get current time in Jakarta timezone
+                const now = new Date();
+                const jakartaOffset = 7 * 60; // UTC+7 in minutes
+                const userOffset = now.getTimezoneOffset(); // User's timezone offset
+                const jakartaTime = new Date(now.getTime() + (jakartaOffset + userOffset) * 60 * 1000);
 
-            laundryData.push(laundryItem);
-            saveLaundryData();
-            updateUI();
+                // Pickup time is 24 hours from now
+                const pickupTime = new Date(jakartaTime.getTime() + 24 * 60 * 60 * 1000);
 
-            // Sync to Google Calendar if connected
-            if (googleCalendarConnected && gapiInited) {
-                addToGoogleCalendar(laundryItem);
+                const laundryItem = {
+                    id: Date.now(),
+                    startTime: jakartaTime.toISOString(),
+                    pickupTime: pickupTime.toISOString(),
+                    status: 'active',
+                    synced: false,
+                    calendarEventId: null,
+                    // Dummy data
+                    weight: '5 kg',
+                    location: 'Laundry Express'
+                };
+
+                console.log('New laundry item:', laundryItem); // Debug log
+
+                laundryData.push(laundryItem);
+                saveLaundryData();
+                updateUI();
+
+                // Sync to Google Calendar if connected
+                if (googleCalendarConnected && gapiInited) {
+                    addToGoogleCalendar(laundryItem);
+                }
+
+                showToast('success', 'Laundry added successfully! Reminder will appear in 24 hours.');
+            } catch (error) {
+                console.error('Error in addLaundry:', error);
+                alert('Error adding laundry: ' + error.message);
             }
+        }
 
-            showToast('success', 'Laundry berhasil ditambahkan! Reminder akan muncul 24 jam dari sekarang.');
+        // Pick up Latest Laundry (Big Button)
+        function pickupLatestLaundry() {
+            try {
+                console.log('pickupLatestLaundry called'); // Debug log
+
+                const activeLaundry = laundryData.filter(l => l.status === 'active');
+
+                if (activeLaundry.length === 0) {
+                    showToast('info', 'No active laundry to pick up');
+                    return;
+                }
+
+                // Get the most recent active laundry (last added)
+                const latestLaundry = activeLaundry[activeLaundry.length - 1];
+                console.log('Marking complete:', latestLaundry); // Debug log
+                markComplete(latestLaundry.id);
+            } catch (error) {
+                console.error('Error in pickupLatestLaundry:', error);
+                alert('Error picking up laundry: ' + error.message);
+            }
         }
 
         // Mark as Complete
@@ -411,13 +577,13 @@
                     deleteFromGoogleCalendar(item.calendarEventId);
                 }
 
-                showToast('success', 'Laundry ditandai selesai!');
+                showToast('success', 'Laundry marked as completed!');
             }
         }
 
         // Delete Laundry
         function deleteLaundry(id) {
-            if (!confirm('Yakin ingin menghapus laundry ini?')) return;
+            if (!confirm('Are you sure you want to delete this laundry?')) return;
 
             const item = laundryData.find(l => l.id === id);
             if (item && item.calendarEventId && googleCalendarConnected && gapiInited) {
@@ -427,7 +593,7 @@
             laundryData = laundryData.filter(l => l.id !== id);
             saveLaundryData();
             updateUI();
-            showToast('info', 'Laundry dihapus!');
+            showToast('info', 'Laundry deleted!');
         }
 
         // Update UI
@@ -439,13 +605,26 @@
             document.getElementById('active-count').textContent = activeLaundry.length;
             document.getElementById('completed-count').textContent = completedLaundry.length;
 
+            // Update pickup button
+            const pickupBtn = document.getElementById('pickup-button');
+            const pickupBtnText = document.getElementById('pickup-button-text');
+            if (activeLaundry.length > 0) {
+                pickupBtn.style.opacity = '1';
+                pickupBtn.style.cursor = 'pointer';
+                pickupBtnText.textContent = `Click to mark latest laundry as complete (${activeLaundry.length} active)`;
+            } else {
+                pickupBtn.style.opacity = '0.6';
+                pickupBtn.style.cursor = 'not-allowed';
+                pickupBtnText.textContent = 'No active laundry';
+            }
+
             // Update active laundry list
             const activeContainer = document.getElementById('active-laundry');
             if (activeLaundry.length === 0) {
                 activeContainer.innerHTML = `
                     <div class="empty-state">
                         <i class="bi bi-inbox"></i>
-                        <p class="mb-0">Tidak ada laundry aktif</p>
+                        <p class="mb-0">No active laundry</p>
                     </div>
                 `;
             } else {
@@ -458,19 +637,152 @@
                 historyContainer.innerHTML = `
                     <div class="empty-state">
                         <i class="bi bi-archive"></i>
-                        <p class="mb-0">Belum ada riwayat</p>
+                        <p class="mb-0">No history yet</p>
                     </div>
                 `;
             } else {
-                historyContainer.innerHTML = completedLaundry.slice(-10).reverse().map(item => createLaundryCard(item)).join('');
+                historyContainer.innerHTML = `
+                    <table class="history-table table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>ID</th>
+                                <th>Dropped Off</th>
+                                <th>Picked Up</th>
+                                <th style="width: 100px;">Status</th>
+                                <th style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${completedLaundry.slice(-10).reverse().map((item, index) => createHistoryTableRow(item, index)).join('')}
+                        </tbody>
+                    </table>
+                `;
             }
 
             // Update sync status
             const syncStatusEl = document.getElementById('sync-status');
             if (googleCalendarConnected) {
-                syncStatusEl.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> Tersinkronisasi';
+                syncStatusEl.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> Synced';
             } else {
-                syncStatusEl.innerHTML = '<i class="bi bi-x-circle-fill text-muted me-1"></i> Belum tersinkronisasi';
+                syncStatusEl.innerHTML = '<i class="bi bi-x-circle-fill text-muted me-1"></i> Not synced';
+            }
+        }
+
+        // Create History Table Row
+        function createHistoryTableRow(item, index) {
+            const startTime = new Date(item.startTime);
+            const pickupTime = new Date(item.pickupTime);
+            const completedTime = item.completedTime ? new Date(item.completedTime) : null;
+            const rowId = `history-row-${item.id}`;
+            const detailsId = `history-details-${item.id}`;
+
+            return `
+                <tr class="history-row" id="${rowId}" onclick="toggleHistoryDetails('${item.id}')">
+                    <td>
+                        <i class="bi bi-chevron-right me-1" id="chevron-${item.id}"></i>
+                        <strong>${index + 1}</strong>
+                    </td>
+                    <td>
+                        <i class="bi bi-droplet-fill text-primary me-2"></i>
+                        #${item.id}
+                        ${item.synced ? '<i class="bi bi-google text-danger ms-2" title="Synced to Google Calendar"></i>' : ''}
+                    </td>
+                    <td>
+                        <small>${formatDateTime(startTime)}</small>
+                    </td>
+                    <td>
+                        <small>${completedTime ? formatDateTime(completedTime) : '-'}</small>
+                    </td>
+                    <td>
+                        <span class="badge bg-success badge-status">
+                            <i class="bi bi-check-lg me-1"></i>
+                            Completed
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); deleteLaundry(${item.id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr id="${detailsId}" class="history-details-row" style="display: none;">
+                    <td colspan="6" class="p-0">
+                        <div class="history-details" id="${detailsId}-content">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="bi bi-box-arrow-in-down me-2"></i>
+                                        Drop Off Time
+                                    </h6>
+                                    <p class="mb-0 fw-semibold">${formatDateTime(startTime)}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="bi bi-clock me-2"></i>
+                                        Scheduled Pick Up
+                                    </h6>
+                                    <p class="mb-0 fw-semibold">${formatDateTime(pickupTime)}</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="text-muted mb-2">
+                                        <i class="bi bi-box-arrow-up me-2"></i>
+                                        Actual Pick Up
+                                    </h6>
+                                    <p class="mb-0 fw-semibold">${completedTime ? formatDateTime(completedTime) : '-'}</p>
+                                </div>
+                            </div>
+                            ${item.weight || item.location ? `
+                                <div class="row mt-3">
+                                    ${item.weight ? `
+                                        <div class="col-md-6">
+                                            <h6 class="text-muted mb-2">
+                                                <i class="bi bi-boxes me-2"></i>
+                                                Weight
+                                            </h6>
+                                            <p class="mb-0">${item.weight}</p>
+                                        </div>
+                                    ` : ''}
+                                    ${item.location ? `
+                                        <div class="col-md-6">
+                                            <h6 class="text-muted mb-2">
+                                                <i class="bi bi-geo-alt me-2"></i>
+                                                Location
+                                            </h6>
+                                            <p class="mb-0">${item.location}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
+        // Toggle History Details
+        function toggleHistoryDetails(itemId) {
+            const detailsRow = document.getElementById(`history-details-${itemId}`);
+            const detailsContent = document.getElementById(`history-details-${itemId}-content`);
+            const mainRow = document.getElementById(`history-row-${itemId}`);
+            const chevron = document.getElementById(`chevron-${itemId}`);
+
+            if (detailsRow.style.display === 'none') {
+                detailsRow.style.display = 'table-row';
+                detailsContent.classList.add('show');
+                mainRow.classList.add('expanded');
+                if (chevron) {
+                    chevron.classList.remove('bi-chevron-right');
+                    chevron.classList.add('bi-chevron-down');
+                }
+            } else {
+                detailsRow.style.display = 'none';
+                detailsContent.classList.remove('show');
+                mainRow.classList.remove('expanded');
+                if (chevron) {
+                    chevron.classList.remove('bi-chevron-down');
+                    chevron.classList.add('bi-chevron-right');
+                }
             }
         }
 
@@ -493,13 +805,13 @@
                                 <div class="col-md-6">
                                     <small class="text-muted">
                                         <i class="bi bi-box-arrow-in-down me-1"></i>
-                                        <strong>Ditaruh:</strong> ${formatDateTime(startTime)}
+                                        <strong>Dropped off:</strong> ${formatDateTime(startTime)}
                                     </small>
                                 </div>
                                 <div class="col-md-6">
                                     <small class="text-muted">
                                         <i class="bi bi-box-arrow-up me-1"></i>
-                                        <strong>Diambil:</strong> ${formatDateTime(pickupTime)}
+                                        <strong>Pick up:</strong> ${formatDateTime(pickupTime)}
                                     </small>
                                 </div>
                             </div>
@@ -509,7 +821,7 @@
                                 <div class="mt-3">
                                     <span class="badge bg-success badge-status">
                                         <i class="bi bi-check-lg me-1"></i>
-                                        Selesai
+                                        Completed
                                     </span>
                                     ${item.completedTime ? `<small class="text-muted ms-2">${formatDateTime(new Date(item.completedTime))}</small>` : ''}
                                 </div>
@@ -518,11 +830,11 @@
                         <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
                             ${isActive ? `
                                 <button class="btn btn-success me-2 mb-2" onclick="markComplete(${item.id})">
-                                    <i class="bi bi-check-circle me-1"></i> Selesai
+                                    <i class="bi bi-check-circle me-1"></i> Complete
                                 </button>
                             ` : ''}
                             <button class="btn btn-outline-danger mb-2" onclick="deleteLaundry(${item.id})">
-                                <i class="bi bi-trash me-1"></i> Hapus
+                                <i class="bi bi-trash me-1"></i> Delete
                             </button>
                         </div>
                     </div>
@@ -535,7 +847,7 @@
             setInterval(() => {
                 const activeLaundry = laundryData.filter(l => l.status === 'active');
                 activeLaundry.forEach(item => {
-                    const countdownEl = document.getElementById(\`countdown-\${item.id}\`);
+                    const countdownEl = document.getElementById(`countdown-${item.id}`);
                     if (countdownEl) {
                         const remaining = new Date(item.pickupTime) - new Date();
                         if (remaining > 0) {
@@ -545,16 +857,16 @@
                             else if (hours < 3) className += ' warning';
 
                             countdownEl.className = className;
-                            countdownEl.innerHTML = \`
+                            countdownEl.innerHTML = `
                                 <i class="bi bi-alarm me-2"></i>
-                                \${formatCountdown(remaining)}
-                            \`;
+                                ${formatCountdown(remaining)}
+                            `;
                         } else {
                             countdownEl.className = 'countdown danger';
-                            countdownEl.innerHTML = \`
+                            countdownEl.innerHTML = `
                                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                                Waktunya mengambil laundry!
-                            \`;
+                                Time to pick up laundry!
+                            `;
                         }
                     }
                 });
@@ -566,7 +878,7 @@
             const hours = Math.floor(ms / (1000 * 60 * 60));
             const minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((ms % (1000 * 60)) / 1000);
-            return \`\${hours.toString().padStart(2, '0')}:\${minutes.toString().padStart(2, '0')}:\${seconds.toString().padStart(2, '0')}\`;
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
 
         // Format DateTime
@@ -590,18 +902,27 @@
             const saved = localStorage.getItem('laundryData');
             if (saved) {
                 laundryData = JSON.parse(saved);
+                // Fix any old records with wrong status
+                laundryData = laundryData.map(item => {
+                    if (item.status === 'ongoing') {
+                        item.status = 'active';
+                    }
+                    return item;
+                });
+                saveLaundryData(); // Save the fixed data
+                console.log('Loaded laundry data:', laundryData);
             }
         }
 
         // Show Toast
         function showToast(type, message) {
             const toast = document.createElement('div');
-            toast.className = \`alert alert-\${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed top-0 start-50 translate-middle-x mt-3\`;
+            toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed top-0 start-50 translate-middle-x mt-3`;
             toast.style.zIndex = '9999';
-            toast.innerHTML = \`
-                <i class="bi bi-\${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle'} me-2"></i>
-                \${message}
-            \`;
+            toast.innerHTML = `
+                <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'error' ? 'x-circle' : 'info-circle'} me-2"></i>
+                ${message}
+            `;
             document.body.appendChild(toast);
             setTimeout(() => {
                 toast.remove();
@@ -679,13 +1000,13 @@
         // Sync to Google Calendar
         function syncGoogleCalendar() {
             if (!gapiInited || !gisInited) {
-                showToast('error', 'Google Calendar API belum siap atau belum dikonfigurasi. Silakan cek CLIENT_ID dan API_KEY di kode.');
+                showToast('error', 'Google Calendar API is not ready or not configured. Please check CLIENT_ID and API_KEY in the code.');
                 return;
             }
 
             tokenClient.callback = async (resp) => {
                 if (resp.error !== undefined) {
-                    showToast('error', 'Gagal connect ke Google: ' + resp.error);
+                    showToast('error', 'Failed to connect to Google: ' + resp.error);
                     return;
                 }
 
@@ -700,7 +1021,7 @@
                     await addToGoogleCalendar(item);
                 }
 
-                showToast('success', 'Berhasil tersinkronisasi dengan Google Calendar!');
+                showToast('success', 'Successfully synced with Google Calendar!');
             };
 
             if (gapi.client.getToken() === null) {
@@ -714,8 +1035,8 @@
         async function addToGoogleCalendar(laundryItem) {
             try {
                 const event = {
-                    'summary': 'Ambil Laundry',
-                    'description': \`Reminder untuk mengambil laundry yang ditaruh pada \${formatDateTime(new Date(laundryItem.startTime))}\`,
+                    'summary': 'Pick Up Laundry',
+                    'description': `Reminder to pick up laundry dropped off on ${formatDateTime(new Date(laundryItem.startTime))}`,
                     'start': {
                         'dateTime': laundryItem.pickupTime,
                         'timeZone': 'Asia/Jakarta'
@@ -747,7 +1068,7 @@
                 console.log('Event created: ' + request.result.htmlLink);
             } catch (err) {
                 console.error('Error adding to calendar:', err);
-                showToast('error', 'Gagal menambahkan ke Google Calendar: ' + err.message);
+                showToast('error', 'Failed to add to Google Calendar: ' + err.message);
             }
         }
 

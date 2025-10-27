@@ -18,6 +18,9 @@
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 
+    <!-- Google API -->
+    <script src="https://apis.google.com/js/api.js"></script>
+
     <style>
         :root {
             --primary-color: #435ebe;
@@ -834,7 +837,10 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <script>
+    <script type="module">
+        // Import Google API Configuration
+        import { GOOGLE_CONFIG } from '../credentials/config.js';
+
         // Data Storage
         let laundryData = JSON.parse(localStorage.getItem('laundryData')) || [];
         let googleCalendarConnected = localStorage.getItem('googleCalendarConnected') === 'true';
@@ -853,11 +859,11 @@
         // Current Page
         let currentPageName = localStorage.getItem('currentPageName') || 'order';
 
-        // Google Calendar Config
-        const CLIENT_ID = '94841162826-kv0mlo9l2d5fh0lmmpscef7ihhbojif6.apps.googleusercontent.com';
-        const API_KEY = 'AIzaSyBQcJ2X5Y6Z1Z2Z3Z4Z5Z6Z7Z8Z9Z0Z1Z2'; // Note: This should be obtained from Google Cloud Console
-        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
-        const SCOPES = 'https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email';
+        // Google Calendar Config - imported from secure config file
+        const CLIENT_ID = GOOGLE_CONFIG.CLIENT_ID;
+        const API_KEY = GOOGLE_CONFIG.API_KEY;
+        const DISCOVERY_DOC = GOOGLE_CONFIG.DISCOVERY_DOC;
+        const SCOPES = GOOGLE_CONFIG.SCOPES;
 
         // User Session
         let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
@@ -2121,16 +2127,25 @@
         // Add Event to Google Calendar
         async function addToGoogleCalendar(laundryItem) {
             try {
+                // Determine timezone
+                const timezoneMap = {
+                    'system': Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    'utc+7': 'Asia/Jakarta',
+                    'utc+8': 'Asia/Singapore',
+                    'utc+0': 'UTC'
+                };
+                const timeZone = timezoneMap[currentTimezone] || 'Asia/Jakarta';
+
                 const event = {
-                    'summary': 'Pick Up Laundry',
-                    'description': `Reminder to pick up laundry dropped off on ${formatDateTime(new Date(laundryItem.startTime))}`,
+                    'summary': `Pick Up Laundry${laundryItem.location ? ' from ' + laundryItem.location : ''}`,
+                    'description': `Reminder to pick up laundry dropped off on ${formatDateTime(new Date(laundryItem.startTime))}\n\nLocation: ${laundryItem.location || 'Not specified'}`,
                     'start': {
                         'dateTime': laundryItem.pickupTime,
-                        'timeZone': 'Asia/Jakarta'
+                        'timeZone': timeZone
                     },
                     'end': {
                         'dateTime': new Date(new Date(laundryItem.pickupTime).getTime() + 60*60*1000).toISOString(),
-                        'timeZone': 'Asia/Jakarta'
+                        'timeZone': timeZone
                     },
                     'reminders': {
                         'useDefault': false,
@@ -2138,7 +2153,8 @@
                             {'method': 'popup', 'minutes': 30},
                             {'method': 'popup', 'minutes': 60}
                         ]
-                    }
+                    },
+                    'colorId': '9' // Blue color for laundry reminders
                 };
 
                 const request = await gapi.client.calendar.events.insert({
@@ -2153,9 +2169,11 @@
                 updateUI();
 
                 console.log('Event created: ' + request.result.htmlLink);
+                return request.result;
             } catch (err) {
                 console.error('Error adding to calendar:', err);
                 showToast('error', 'Failed to add to Google Calendar: ' + err.message);
+                throw err;
             }
         }
 
@@ -2171,6 +2189,27 @@
                 console.error('Error deleting from calendar:', err);
             }
         }
+
+        // Expose functions to window object for inline event handlers
+        window.toggleSidebar = toggleSidebar;
+        window.navigateTo = navigateTo;
+        window.addLaundry = addLaundry;
+        window.pickupLatestLaundry = pickupLatestLaundry;
+        window.confirmDropOff = confirmDropOff;
+        window.openSettingsFromSelector = openSettingsFromSelector;
+        window.markComplete = markComplete;
+        window.toggleHistoryRow = toggleHistoryRow;
+        window.goToPage = goToPage;
+        window.changeRowsPerPage = changeRowsPerPage;
+        window.setTimezone = setTimezone;
+        window.setLocationMode = setLocationMode;
+        window.setDefaultLocation = setDefaultLocation;
+        window.openAddShopModal = openAddShopModal;
+        window.saveNewShop = saveNewShop;
+        window.deleteShop = deleteShop;
+        window.syncGoogleCalendar = syncGoogleCalendar;
+        window.handleCredentialResponse = handleCredentialResponse;
+        window.signOut = signOut;
     </script>
 </body>
 </html>

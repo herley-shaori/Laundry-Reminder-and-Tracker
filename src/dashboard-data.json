@@ -1,0 +1,79 @@
+{
+  "overview": {
+    "totalOrders": 156,
+    "activeOrders": 12,
+    "completedOrders": 144,
+    "totalRevenue": 15600000
+  },
+  "monthlyStats": {
+    "january": 45,
+    "february": 52,
+    "march": 48,
+    "april": 55,
+    "may": 62,
+    "june": 58,
+    "july": 67,
+    "august": 71,
+    "september": 68,
+    "october": 78,
+    "november": 0,
+    "december": 0
+  },
+  "popularServices": [
+    {
+      "name": "Regular Wash",
+      "count": 89,
+      "percentage": 57
+    },
+    {
+      "name": "Express Wash",
+      "count": 42,
+      "percentage": 27
+    },
+    {
+      "name": "Dry Clean",
+      "count": 25,
+      "percentage": 16
+    }
+  ],
+  "topShops": [
+    {
+      "name": "Laundry Express",
+      "orders": 78,
+      "rating": 4.8
+    },
+    {
+      "name": "QuickWash 24",
+      "orders": 45,
+      "rating": 4.6
+    },
+    {
+      "name": "Premium Laundry",
+      "orders": 33,
+      "rating": 4.9
+    }
+  ],
+  "recentActivity": [
+    {
+      "id": "1761534512584",
+      "action": "Order Completed",
+      "shop": "Laundry Express",
+      "time": "2 hours ago",
+      "status": "completed"
+    },
+    {
+      "id": "1761523401234",
+      "action": "New Order",
+      "shop": "QuickWash 24",
+      "time": "5 hours ago",
+      "status": "active"
+    },
+    {
+      "id": "1761512290123",
+      "action": "Order Completed",
+      "shop": "Premium Laundry",
+      "time": "1 day ago",
+      "status": "completed"
+    }
+  ]
+}

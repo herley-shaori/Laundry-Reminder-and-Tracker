@@ -1,0 +1,20 @@
+{
+  "pickupDurations": [
+    {
+      "label": "3 Hours",
+      "hours": 3,
+      "buttonClass": "btn-primary"
+    },
+    {
+      "label": "5 Hours",
+      "hours": 5,
+      "buttonClass": "btn-primary"
+    },
+    {
+      "label": "24 Hours",
+      "hours": 24,
+      "buttonClass": "btn-primary"
+    }
+  ],
+  "defaultPickupDuration": 24
+}

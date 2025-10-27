@@ -875,6 +875,18 @@
         // Sidebar Toggle
         let sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
 
+        // Forward declarations for functions that need to be on window object
+        // This ensures they're available before Google Sign-In initializes
+        let handleCredentialResponse;
+        let signOut;
+        let updateUserSection;
+
+        // Expose key functions to window immediately (before they're defined)
+        // This is critical for Google Sign-In callback to work
+        window.handleCredentialResponse = null; // Will be set later
+        window.signOut = null; // Will be set later
+        window.updateUserSection = null; // Will be set later
+
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
             const mainContent = document.querySelector('.main-content');
@@ -1978,8 +1990,10 @@
         }
 
         // Google Sign-In Functions
-        function handleCredentialResponse(response) {
+        handleCredentialResponse = function(response) {
             try {
+                console.log('handleCredentialResponse called', response);
+
                 // Decode JWT token to get user info
                 const token = response.credential;
                 const base64Url = token.split('.')[1];
@@ -2000,6 +2014,8 @@
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 localStorage.setItem('googleToken', token);
 
+                console.log('User logged in:', currentUser);
+
                 updateUserSection();
                 showToast('success', `Welcome, ${currentUser.name}!`);
 
@@ -2014,9 +2030,12 @@
                 console.error('Error handling credential response:', err);
                 showToast('error', 'Failed to sign in with Google');
             }
-        }
+        };
+        window.handleCredentialResponse = handleCredentialResponse;
 
-        function signOut() {
+        signOut = function() {
+            const userToRevoke = currentUser?.sub;
+
             currentUser = null;
             localStorage.removeItem('currentUser');
             localStorage.removeItem('googleToken');
@@ -2024,10 +2043,13 @@
             localStorage.setItem('googleCalendarConnected', 'false');
 
             // Revoke Google token
-            if (gapi.client.getToken()) {
-                google.accounts.id.revoke(currentUser?.sub, done => {
+            if (userToRevoke && typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.revoke(userToRevoke, done => {
                     console.log('Token revoked');
                 });
+            }
+
+            if (typeof gapi !== 'undefined' && gapi.client && gapi.client.getToken()) {
                 gapi.client.setToken(null);
             }
 
@@ -2035,12 +2057,15 @@
             updateUI();
             updateSyncButton();
             showToast('info', 'Signed out successfully');
-        }
+        };
+        window.signOut = signOut;
 
-        function updateUserSection() {
+        updateUserSection = function() {
+            console.log('updateUserSection called, currentUser:', currentUser);
             const userSection = document.getElementById('userSection');
 
             if (currentUser) {
+                console.log('Showing user profile');
                 userSection.innerHTML = `
                     <div class="dropdown">
                         <button class="btn btn-sm btn-outline-light dropdown-toggle d-flex align-items-center" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -2060,35 +2085,39 @@
                     </div>
                 `;
             } else {
-                userSection.innerHTML = `
-                    <div id="g_id_onload"
-                         data-client_id="${CLIENT_ID}"
-                         data-callback="handleCredentialResponse"
-                         data-auto_prompt="false">
-                    </div>
-                    <div class="g_id_signin"
-                         data-type="standard"
-                         data-size="medium"
-                         data-theme="outline"
-                         data-text="sign_in_with"
-                         data-shape="rectangular"
-                         data-logo_alignment="left">
-                    </div>
-                `;
+                console.log('Showing sign in button');
+                userSection.innerHTML = `<div class="g_id_signin"></div>`;
 
                 // Reinitialize Google Sign-In button
-                if (typeof google !== 'undefined' && google.accounts) {
-                    google.accounts.id.initialize({
-                        client_id: CLIENT_ID,
-                        callback: handleCredentialResponse
-                    });
-                    google.accounts.id.renderButton(
-                        document.querySelector('.g_id_signin'),
-                        { theme: "outline", size: "medium", text: "signin_with" }
-                    );
-                }
+                // Need to use setTimeout to ensure DOM is ready
+                setTimeout(() => {
+                    if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                        console.log('Initializing Google Sign-In with CLIENT_ID:', CLIENT_ID);
+                        google.accounts.id.initialize({
+                            client_id: CLIENT_ID,
+                            callback: window.handleCredentialResponse,
+                            auto_select: false
+                        });
+                        const buttonDiv = document.querySelector('.g_id_signin');
+                        if (buttonDiv) {
+                            google.accounts.id.renderButton(
+                                buttonDiv,
+                                {
+                                    theme: "outline",
+                                    size: "medium",
+                                    text: "signin_with",
+                                    width: 200
+                                }
+                            );
+                            console.log('Google Sign-In button rendered');
+                        }
+                    } else {
+                        console.error('Google Sign-In not available');
+                    }
+                }, 100);
             }
-        }
+        };
+        window.updateUserSection = updateUserSection;
 
         // Sync to Google Calendar
         function syncGoogleCalendar() {
@@ -2191,6 +2220,7 @@
         }
 
         // Expose functions to window object for inline event handlers
+        // Note: handleCredentialResponse, signOut, and updateUserSection are already exposed earlier
         window.toggleSidebar = toggleSidebar;
         window.navigateTo = navigateTo;
         window.addLaundry = addLaundry;
@@ -2208,8 +2238,6 @@
         window.saveNewShop = saveNewShop;
         window.deleteShop = deleteShop;
         window.syncGoogleCalendar = syncGoogleCalendar;
-        window.handleCredentialResponse = handleCredentialResponse;
-        window.signOut = signOut;
     </script>
 </body>
 </html>

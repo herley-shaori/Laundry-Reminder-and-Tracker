@@ -1270,8 +1270,20 @@
                 updateUI();
 
                 // Sync to Google Calendar if connected
-                if (googleCalendarConnected && gapiInited) {
-                    addToGoogleCalendar(laundryItem);
+                if (currentUser && gapiInited && gisInited) {
+                    // Check if we have calendar access token
+                    if (gapi.client.getToken()) {
+                        addToGoogleCalendar(laundryItem).catch(err => {
+                            console.error('Failed to add to calendar:', err);
+                        });
+                    } else {
+                        // Prompt user to authorize calendar access
+                        console.log('No calendar access token, user needs to authorize');
+                        showToast('info', 'Click "Sync Calendar" in your profile menu to enable calendar reminders', 5000);
+                    }
+                } else if (currentUser && !gapiInited) {
+                    console.warn('Google Calendar API not initialized');
+                    showToast('warning', 'Calendar sync unavailable - API not initialized', 3000);
                 }
 
                 showToast('success', `Laundry added successfully at ${location}! Reminder will appear in 24 hours.`);
@@ -2017,15 +2029,7 @@
                 console.log('User logged in:', currentUser);
 
                 updateUserSection();
-                showToast('success', `Welcome, ${currentUser.name}!`);
-
-                // Initialize calendar sync after login
-                if (gapiInited) {
-                    googleCalendarConnected = true;
-                    localStorage.setItem('googleCalendarConnected', 'true');
-                    updateUI();
-                    updateSyncButton();
-                }
+                showToast('success', `Welcome, ${currentUser.name}! Click "Sync Calendar" in your profile to enable calendar reminders.`, 6000);
             } catch (err) {
                 console.error('Error handling credential response:', err);
                 showToast('error', 'Failed to sign in with Google');
@@ -2128,9 +2132,12 @@
 
             tokenClient.callback = async (resp) => {
                 if (resp.error !== undefined) {
-                    showToast('error', 'Failed to connect to Google: ' + resp.error);
+                    console.error('OAuth error:', resp.error);
+                    showToast('error', 'Failed to connect to Google Calendar: ' + resp.error);
                     return;
                 }
+
+                console.log('OAuth token received successfully');
 
                 googleCalendarConnected = true;
                 localStorage.setItem('googleCalendarConnected', 'true');
@@ -2139,11 +2146,28 @@
 
                 // Sync all unsynced items
                 const unsynced = laundryData.filter(l => l.status === 'active' && !l.synced);
+                console.log('Syncing ' + unsynced.length + ' unsynced items to calendar');
+
+                let successCount = 0;
+                let failCount = 0;
+
                 for (const item of unsynced) {
-                    await addToGoogleCalendar(item);
+                    try {
+                        await addToGoogleCalendar(item);
+                        successCount++;
+                    } catch (err) {
+                        console.error('Failed to sync item:', item, err);
+                        failCount++;
+                    }
                 }
 
-                showToast('success', 'Successfully synced with Google Calendar!');
+                if (successCount > 0) {
+                    showToast('success', `Calendar access granted! ${successCount} reminder(s) synced.`, 4000);
+                } else if (failCount > 0) {
+                    showToast('warning', 'Calendar connected but some items failed to sync.', 4000);
+                } else {
+                    showToast('success', 'Calendar access granted! Ready to create reminders.', 4000);
+                }
             };
 
             if (gapi.client.getToken() === null) {
@@ -2156,6 +2180,17 @@
         // Add Event to Google Calendar
         async function addToGoogleCalendar(laundryItem) {
             try {
+                // Validate prerequisites
+                if (!gapi || !gapi.client || !gapi.client.calendar) {
+                    throw new Error('Google Calendar API not loaded. Please refresh the page.');
+                }
+
+                if (!gapi.client.getToken()) {
+                    throw new Error('Not authorized. Please click "Sync Calendar" in your profile menu.');
+                }
+
+                console.log('Adding laundry to Google Calendar:', laundryItem);
+
                 // Determine timezone
                 const timezoneMap = {
                     'system': Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -2186,6 +2221,8 @@
                     'colorId': '9' // Blue color for laundry reminders
                 };
 
+                console.log('Creating calendar event:', event);
+
                 const request = await gapi.client.calendar.events.insert({
                     'calendarId': 'primary',
                     'resource': event
@@ -2197,11 +2234,13 @@
                 saveLaundryData();
                 updateUI();
 
-                console.log('Event created: ' + request.result.htmlLink);
+                console.log('Event created successfully:', request.result.htmlLink);
+                showToast('success', 'Reminder added to Google Calendar!');
                 return request.result;
             } catch (err) {
                 console.error('Error adding to calendar:', err);
-                showToast('error', 'Failed to add to Google Calendar: ' + err.message);
+                const errorMessage = err.message || 'Unknown error';
+                showToast('error', 'Failed to add to Google Calendar: ' + errorMessage);
                 throw err;
             }
         }
